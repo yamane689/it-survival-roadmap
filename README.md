@@ -1,9 +1,9 @@
 # it-survival-roadmap
 Dead or Alive Engineering
 
-DAY1
-DAY2
-DAY3
+DAY1 -計画- javaを使った製作 
+DAY2 Valorantでサボり
+DAY3 
 DAY4
 DAY5
 DAY6
