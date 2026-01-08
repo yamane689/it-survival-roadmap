@@ -3,8 +3,8 @@ Dead or Alive Engineering
 
 DAY1 -計画- javaを使った製作 
 DAY2 Valorantでサボり
-DAY3 
-DAY4
+DAY3 JavaのClassPathとPackege
+DAY4 20代にやらんとチンカスよ
 DAY5
 DAY6
 DAY7
