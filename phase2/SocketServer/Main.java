@@ -12,22 +12,31 @@ public class Main {
 
         System.out.println("Starting server on port " + port);
 
+        // 8080番ポートを開く（LISTEN開始）
         ServerSocket serverSocket = new ServerSocket(port);
+        // クライアントからの接続を待つ（ブロッキング）
         Socket socket = serverSocket.accept();
         System.out.println("Client connected");
 
+        // クライアントが送ってきたデータを読むための入力ストリーム
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         String line;
         System.out.println("----- request start -----");
+
+        // HTTPリクエストを1行ずつ読み込む
         while ((line = in.readLine()) != null) {
-            if (line.isEmpty()) break; // HTTPヘッダの終わり
+            // 空行がHTTPヘッダの終わりを表す
+            if (line.isEmpty()) break;
             System.out.println(line);
         }
         System.out.println("----- request end -----");
 
+        // クライアントへデータを書き込むための出力ストリーム
         OutputStream out = socket.getOutputStream();
 
         String body = "Hello from SocketServer\n";
+
+        // HTTPレスポンスを手動で組み立て(ヘッダ+ボディ)
         String response = 
             "HTTP/1.1 200 OK\r\n" +
             "Content-Type: text/plain; charset=utf-8\r\n" +
@@ -36,10 +45,13 @@ public class Main {
             "\r\n" +
             body;
 
+        // クライアントへレスポンスを送信
         out.write(response.getBytes("UTF-8"));
         out.flush();
 
+        // クライアントとの接続をクローズ
         socket.close();
+        // サーバを終了
         serverSocket.close();
     }
 }

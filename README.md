@@ -5,11 +5,11 @@ DAY1 -計画- javaを使った製作
 DAY2 Valorantでサボり
 DAY3 JavaのClassPathとPackege
 DAY4 20代にやらんとチンカスよ
-DAY5
-DAY6
-DAY7
-DAY8
-DAY9
+DAY5 国立競技場 -準決勝-
+DAY6 大竹里奈 -引越し-
+DAY7 完全なるサボり
+DAY8 海外で働く実力を -走るだけ、シャバいやつだらけ-
+DAY9 
 DAY10
 DAY11
 DAY12
