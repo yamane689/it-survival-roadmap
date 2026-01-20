@@ -57,6 +57,10 @@ public class Main {
         }
         String requestBody = new String(bodyChars, 0, readTotal);
 
+        var params = parseFormUrlEncoded(requestBody);
+        System.out.println("parsed params = " + params);
+
+
         System.out.println("----- body start -----");
         System.out.println(requestBody);
         System.out.println("----- body end -----");
@@ -76,10 +80,20 @@ public class Main {
         // クライアントへデータを書き込むための出力ストリーム
         OutputStream out = socket.getOutputStream();
 
-        // pathの値によってレスポンス内容を切り替える
-        String statusLine;
+        String method = "GET";
+        if (requestLine != null) {
+            String[] parts = requestLine.split(" ");
+            if (parts.length >= 1) {
+                method = parts[0];
+            }
+        }
+        
+        String statusLine = "HTTP/1.1 200 OK\r\n";
         String body;
-        if ("/hello".equals(path)) {
+
+        if("POST".equals(method)){
+            body = "You posted: " + params + "\n";
+        } else if ("/hello".equals(path)) {
             statusLine = "HTTP/1.1 200 OK\r\n";
             body = "Hello route!\n";
         } else {
@@ -105,4 +119,26 @@ public class Main {
         // サーバを終了
         serverSocket.close();
     }
+
+    // リクエストボディをMapに変換する
+    private static java.util.Map<String, String> parseFormUrlEncoded(String body) {
+        java.util.Map<String, String> map = new java.util.HashMap<>();
+        // bodyがない場合は終了
+        if (body == null || body.isEmpty()) 
+            return map;
+        // & で分割した配列を拡張For文でループ
+        for (String pair : body.split("&")) {
+            // KeyとValueに分割
+            String[] kv = pair.split("=", 2);
+            // KeyのURLデコード
+            String key = java.net.URLDecoder.decode(kv[0], java.nio.charset.StandardCharsets.UTF_8);
+            // ValueのURLデコード
+            String value = kv.length > 1
+                    ? java.net.URLDecoder.decode(kv[1], java.nio.charset.StandardCharsets.UTF_8)
+                    : "";
+            map.put(key, value);
+        }
+        return map;
+    }
 }
+
