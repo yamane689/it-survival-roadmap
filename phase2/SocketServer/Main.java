@@ -20,6 +20,7 @@ public class Main {
 
         // クライアントが送ってきたデータを読むための入力ストリーム
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
         // HTTPリクエストの最初の1行を読む
         String requestLine = in.readLine(); 
         System.out.println("----- request start -----");
@@ -27,6 +28,7 @@ public class Main {
 
         int contentLength = 0;
 
+        // リクエストの読み込み
         String line;
         // HTTPリクエストを1行ずつ読み込む
         while ((line = in.readLine()) != null) {
@@ -55,11 +57,12 @@ public class Main {
                 break;
             readTotal += n;
         }
+        // リクエストボディをString型に変換
         String requestBody = new String(bodyChars, 0, readTotal);
 
+        // リクエストボディをURLデコード,Mapに変換
         var params = parseFormUrlEncoded(requestBody);
         System.out.println("parsed params = " + params);
-
 
         System.out.println("----- body start -----");
         System.out.println(requestBody);
@@ -87,7 +90,7 @@ public class Main {
                 method = parts[0];
             }
         }
-        
+
         String statusLine = "HTTP/1.1 200 OK\r\n";
         String body;
 
