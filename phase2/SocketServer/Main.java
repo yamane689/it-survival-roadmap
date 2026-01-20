@@ -23,7 +23,9 @@ public class Main {
         // HTTPリクエストの最初の1行を読む
         String requestLine = in.readLine(); 
         System.out.println("----- request start -----");
-        System.out.println(requestLine);
+        System.out.println("requestLine: " + requestLine);
+
+        int contentLength = 0;
 
         String line;
         // HTTPリクエストを1行ずつ読み込む
@@ -32,8 +34,32 @@ public class Main {
             if (line.isEmpty())
                 break;
             System.out.println(line);
+
+            // HTTPヘッダの中からContent-Length(リクエストボディのバイト数)を探す
+            if (line.toLowerCase().startsWith("content-length:")) {
+                // 数値部分だけの切り出し
+                String value = line.substring("content-length:".length()).trim();
+                // String→int変換
+                contentLength = Integer.parseInt(value);
+            }
         }
         System.out.println("----- request end -----");
+
+        // Content-Length で指定されたサイズ分のリクエストボディを格納する配列を用意
+        char[] bodyChars = new char[contentLength];
+        // 書き込み開始位置
+        int readTotal = 0;
+        while (readTotal < contentLength) {
+            int n = in.read(bodyChars, readTotal, contentLength - readTotal);
+            if (n == -1) 
+                break;
+            readTotal += n;
+        }
+        String requestBody = new String(bodyChars, 0, readTotal);
+
+        System.out.println("----- body start -----");
+        System.out.println(requestBody);
+        System.out.println("----- body end -----");
 
         // リクエストされたパスを格納する変数
         String path = "/";
@@ -51,16 +77,19 @@ public class Main {
         OutputStream out = socket.getOutputStream();
 
         // pathの値によってレスポンス内容を切り替える
+        String statusLine;
         String body;
         if ("/hello".equals(path)) {
+            statusLine = "HTTP/1.1 200 OK\r\n";
             body = "Hello route!\n";
         } else {
-            body = "Root route. Try /hello\n";
+            statusLine = "HTTP/1.1 404 Not Found\r\n";
+            body = "404 Not Found\n";
         }
 
         // HTTPレスポンスを手動で組み立て(ヘッダ+ボディ)
         String response = 
-            "HTTP/1.1 200 OK\r\n" +
+            statusLine +
             "Content-Type: text/plain; charset=utf-8\r\n" +
             "Content-Length: " + body.getBytes("UTF-8").length + "\r\n" +
             "Connection: close\r\n" +
