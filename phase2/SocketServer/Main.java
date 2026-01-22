@@ -30,6 +30,7 @@ public class Main {
 
         // リクエストの読み込み
         String line;
+        String contentType = "";
         // HTTPリクエストを1行ずつ読み込む
         while ((line = in.readLine()) != null) {
             // 空行がHTTPヘッダの終わりを表す
@@ -44,6 +45,11 @@ public class Main {
                 // String→int変換
                 contentLength = Integer.parseInt(value);
             }
+
+            if (line.toLowerCase().startsWith("content-type:")) {
+                contentType = line.substring("content-type:".length()).trim();
+            }
+
         }
         System.out.println("----- request end -----");
 
@@ -60,12 +66,16 @@ public class Main {
         // リクエストボディをString型に変換
         String requestBody = new String(bodyChars, 0, readTotal);
 
-        // リクエストボディをURLデコード,Mapに変換
-        var params = parseFormUrlEncoded(requestBody);
-        System.out.println("parsed params = " + params);
+        if (contentType.startsWith("application/json")) {
+            System.out.println("----- json body -----");
+            System.out.println(requestBody);
+        }
 
         System.out.println("----- body start -----");
         System.out.println(requestBody);
+        // リクエストボディをURLデコード,Mapに変換
+        var params = parseFormUrlEncoded(requestBody);
+        System.out.println("parsed params = " + params);
         System.out.println("----- body end -----");
 
         // リクエストされたパスを格納する変数
@@ -94,7 +104,13 @@ public class Main {
         String statusLine = "HTTP/1.1 200 OK\r\n";
         String body;
 
-        if("POST".equals(method)){
+        if (contentType.startsWith("application/json")) {
+            var jsonMap = parseSimpleJsonObject(requestBody);
+            System.out.println("parsed json = " + jsonMap);
+
+            body = "JSON parsed:" + jsonMap + "\n";
+        }
+        else if("POST".equals(method)){
             body = "You posted: " + params + "\n";
         } else if ("/hello".equals(path)) {
             statusLine = "HTTP/1.1 200 OK\r\n";
@@ -142,6 +158,56 @@ public class Main {
             map.put(key, value);
         }
         return map;
+    }
+
+    private static java.util.Map<String, String> parseSimpleJsonObject(String json) {
+        java.util.Map<String, String> map = new java.util.HashMap<>();
+
+        if (json == null) {
+            return map;
+        }
+
+        // 前後の空白を除去
+        String s = json.trim();
+        // { } を外す
+        if (s.startsWith("{")) s = s.substring(1);
+        if (s.endsWith("}")) s = s.substring(0, s.length() - 1);
+
+        s = s.trim();
+        if (s.isEmpty()) {
+            return map;
+        }
+
+        // カンマで分割
+        for (String pair : s.split(",")) {
+            // KeyとValueの分離
+            String[] kv = pair.split(":", 2);
+            // ：がないデータをスキップ
+            if (kv.length < 2) continue;
+
+            String key = kv[0].trim();
+            String value = kv[1].trim();
+
+            // ダブルクォートを外す（"name" → name）
+            key = stripQuotes(key);
+            value = stripQuotes(value);
+
+            map.put(key, value);
+        }
+        return map;
+    }
+
+    private static String stripQuotes(String s) {
+        if (s == null) {
+            return "";
+        }
+
+        s = s.trim();
+
+        if (s.length() >= 2 && s.startsWith("\"") && s.endsWith("\"")) {
+            return s.substring(1, s.length() - 1);
+        }
+        return s;
     }
 }
 
