@@ -15,7 +15,7 @@ public class DbSmokeTest {
 
         TaskDao dao = new TaskDao(url, user, pass);
 
-        long newId = dao.insert("dao inserted task");
+        long newId = dao.insert("dao inserted task3");
         System.out.println("inserted id =" + newId);
 
         List<Task> tasks = dao.findAll();

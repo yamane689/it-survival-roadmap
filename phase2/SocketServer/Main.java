@@ -6,6 +6,9 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import phase3.dao.TaskDao;
+import phase3.model.Task;
+
 public class Main {
     public static void main(String[] args) throws Exception {
         int port = 8080;
@@ -75,7 +78,6 @@ public class Main {
         System.out.println(requestBody);
         // リクエストボディをURLデコード,Mapに変換
         var params = parseFormUrlEncoded(requestBody);
-        System.out.println("parsed params = " + params);
         System.out.println("----- body end -----");
 
         // リクエストされたパスを格納する変数
@@ -104,7 +106,21 @@ public class Main {
         String statusLine = "HTTP/1.1 200 OK\r\n";
         String body;
 
-        if (contentType.startsWith("application/json")) {
+        String url =
+            "jdbc:mysql://localhost:3306/appdb" +
+            "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Tokyo";
+        String user = "root";
+        String pass = "rootpass";
+
+        TaskDao dao = new TaskDao(url, user, pass);
+
+        if (method.equals("POST") && path.equals("/tasks")) {
+            String title = params.get("title");
+            long id = dao.insert(title);
+
+            body = "created id=" + id;
+        }
+        else if (contentType.startsWith("application/json")) {
             var jsonMap = parseSimpleJsonObject(requestBody);
             System.out.println("parsed json = " + jsonMap);
 
