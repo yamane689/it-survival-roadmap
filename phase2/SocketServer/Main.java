@@ -6,7 +6,10 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import java.util.List;
+
 import phase3.dao.TaskDao;
+import phase3.model.Task;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -113,11 +116,34 @@ public class Main {
 
         TaskDao dao = new TaskDao(url, user, pass);
 
-        if (method.equals("POST") && path.equals("/tasks")) {
+        if(method.equals("GET") && path.equals("/tasks")){
+            List<Task> tasks = dao.findAll();
+
+            StringBuilder json = new StringBuilder();
+
+            json.append("[\n");
+            for (int i = 0; i < tasks.size(); i++) {
+                Task t = tasks.get(i);
+                json.append("{")
+                    .append("\"id\":").append(t.id).append(",")
+                    .append("\"title\":\"").append(t.title).append("\",")
+                    .append("\"createdAt\":\"").append(t.createdAt).append("\"")
+                    .append("}");
+                if (i < tasks.size() - 1){
+                    json.append(",");
+                }
+                json.append("\n");
+            }
+            json.append("]\n");
+
+            body = json.toString();
+            
+        }
+        else if (method.equals("POST") && path.equals("/tasks")) {
             String title = params.get("title");
             long id = dao.insert(title);
 
-            body = "created id=" + id;
+            body = "created id=" + id + "\n";
         }
         else if (contentType.startsWith("application/json")) {
             var jsonMap = parseSimpleJsonObject(requestBody);
