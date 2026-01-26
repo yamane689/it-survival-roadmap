@@ -7,7 +7,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import phase3.dao.TaskDao;
-import phase3.model.Task;
 
 public class Main {
     public static void main(String[] args) throws Exception {
