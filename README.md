@@ -13,7 +13,7 @@ DAY9 体調不良からの復帰 -解放-
 DAY10 Json 初代チャットとの別れ
 DAY11 DB接続
 DAY12 Daoの作成と接続
-DAY13
+DAY13 新しいタスク -2週間プラン-
 DAY14
 DAY15
 DAY16
