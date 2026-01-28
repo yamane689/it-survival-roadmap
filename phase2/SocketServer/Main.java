@@ -5,18 +5,18 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-
 import java.util.List;
 
+import phase3.DbConfig;
 import phase3.dao.TaskDao;
 import phase3.model.Task;
 
 public class Main {
     public static void main(String[] args) throws Exception {
         int port = 8080;
-
+        
         System.out.println("Starting server on port " + port);
-
+        
         // 8080番ポートを開く（LISTEN開始）
         ServerSocket serverSocket = new ServerSocket(port);
         // クライアントからの接続を待つ（ブロッキング）
@@ -108,13 +108,7 @@ public class Main {
         String statusLine = "HTTP/1.1 200 OK\r\n";
         String body;
 
-        String url =
-            "jdbc:mysql://localhost:3306/appdb" +
-            "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Tokyo";
-        String user = "root";
-        String pass = "rootpass";
-
-        TaskDao dao = new TaskDao(url, user, pass);
+        TaskDao dao = new TaskDao(DbConfig.URL, DbConfig.USER, DbConfig.PASS);
 
         if(method.equals("GET") && path.equals("/tasks")){
             List<Task> tasks = dao.findAll();
